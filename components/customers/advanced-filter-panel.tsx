@@ -490,7 +490,7 @@ export function AdvancedFilterPanel({ customers, hook }: AdvancedFilterPanelProp
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, phoneSearch: e.target.value }))
               }
-              placeholder="Partial match, e.g. +91 98"
+              placeholder="Partial match, e.g. +9179"
               className="h-8 bg-background/50 text-sm"
             />
           </div>

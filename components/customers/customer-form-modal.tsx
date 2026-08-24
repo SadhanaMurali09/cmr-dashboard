@@ -30,8 +30,8 @@ import type { Customer, CustomerStatus, DealCurrency } from "@/types/customer";
 
 // ─── Zod schema (all fields stay as strings for react-hook-form) ──────────────
 
-// Accepts: +91 XXXXXXXXXX or +91 XXXXX XXXXX (India) or +1 (XXX) XXX-XXXX (US)
-const phoneRegex = /^(\+91\s\d{10}|\+91\s\d{5}\s\d{5}|\+1\s\(\d{3}\)\s\d{3}-\d{4})$/;
+// Accepts: +91XXXXXXXXXX (India, no space) or +1 (XXX) XXX-XXXX (US)
+const phoneRegex = /^(\+91\d{10}|\+1\s\(\d{3}\)\s\d{3}-\d{4})$/;
 
 export const customerSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
@@ -42,7 +42,7 @@ export const customerSchema = z.object({
   phone: z
     .string()
     .min(1, "Phone is required")
-    .regex(phoneRegex, "Format: +91 XXXXX XXXXX or +1 (XXX) XXX-XXXX"),
+    .regex(phoneRegex, "Format: +91XXXXXXXXXX or +1 (XXX) XXX-XXXX"),
   company: z.string().max(100).optional().default(""),
   status: z.enum(["active", "inactive", "lead", "churned"] as const),
   lastContact: z.string().min(1, "Last contact date is required"),
@@ -261,7 +261,7 @@ export function CustomerFormModal({
             <Input
               id="cf-phone"
               type="tel"
-              placeholder="+91 98765 43210"
+              placeholder="+917904307816"
               autoComplete="off"
               className={cn(errors.phone && "border-destructive")}
               {...register("phone")}
