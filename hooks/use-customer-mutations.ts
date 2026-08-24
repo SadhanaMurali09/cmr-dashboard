@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   addCustomer,
   deleteCustomer,
+  reorderCustomers,
   updateCustomer,
   type CustomerInput,
 } from "@/lib/customers-api";
@@ -73,5 +74,20 @@ export function useDeleteCustomer() {
         description: "Something went wrong. Please try again.",
       });
     },
+  });
+}
+
+// ─── Reorder Customers (Drag & Drop) ─────────────────────────────────────────
+
+export function useReorderCustomers() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (ordered: Customer[]) => reorderCustomers(ordered),
+    onSuccess: (updatedList: Customer[]) => {
+      queryClient.setQueryData(customersQueryKey, updatedList);
+    },
+    // Silent on error — drag order is cosmetic, don't distract user with toasts
+    onError: () => {},
   });
 }

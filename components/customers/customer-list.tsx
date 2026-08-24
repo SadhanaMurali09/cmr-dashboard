@@ -50,6 +50,7 @@ import { useCustomerFilters } from "@/hooks/use-customer-filters";
 import {
   useAddCustomer,
   useDeleteCustomer,
+  useReorderCustomers,
   useUpdateCustomer,
 } from "@/hooks/use-customer-mutations";
 import { useCustomers } from "@/hooks/use-customers";
@@ -105,6 +106,7 @@ export function CustomerList() {
   const addMutation = useAddCustomer();
   const updateMutation = useUpdateCustomer();
   const deleteMutation = useDeleteCustomer();
+  const reorderMutation = useReorderCustomers();
 
   // ── DnD sensors ─────────────────────────────────────────────────────────────
   const sensors = useSensors(
@@ -172,11 +174,26 @@ export function CustomerList() {
     const { active, over } = event;
     setActiveId(null);
     if (!over || active.id === over.id) return;
+
     setPageOrder((prev) => {
       const oldIndex = prev.indexOf(String(active.id));
       const newIndex = prev.indexOf(String(over.id));
       if (oldIndex === -1 || newIndex === -1) return prev;
-      return arrayMove(prev, oldIndex, newIndex);
+      const reordered = arrayMove(prev, oldIndex, newIndex);
+
+      // Build the new full customer list with this page's order applied,
+      // then persist it so the drag order survives a browser refresh.
+      const byId = Object.fromEntries(customers.map((c) => [c.id, c]));
+      const pageCustomers = reordered
+        .filter((id) => id in byId)
+        .map((id) => byId[id]);
+      // Customers not on this page keep their relative order at the end.
+      const otherCustomers = customers.filter(
+        (c) => !reordered.includes(c.id)
+      );
+      reorderMutation.mutate([...pageCustomers, ...otherCustomers]);
+
+      return reordered;
     });
   }
 
