@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -13,14 +15,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { mockCustomers } from "@/data/mock-customers";
+import { useCustomers } from "@/hooks/use-customers";
 import {
   formatCustomerDate,
   getCustomerInitials,
 } from "@/lib/customer-utils";
 
 export default function DashboardPage() {
-  const recentCustomers = [...mockCustomers]
+  // Single source of truth — same TanStack Query cache used by the Customers page.
+  // When a customer is added/edited/deleted, the query cache is updated and this
+  // component automatically re-renders with the fresh data.
+  const { data: customers = [] } = useCustomers();
+
+  const recentCustomers = [...customers]
     .sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -33,7 +40,8 @@ export default function DashboardPage() {
       description="Overview of your customer relationships"
     >
       <div className="space-y-6">
-        <OverviewCards customers={mockCustomers} />
+        {/* OverviewCards now receives live data from TanStack Query */}
+        <OverviewCards customers={customers} />
 
         <Card className="bg-card/80">
           <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
