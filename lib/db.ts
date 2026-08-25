@@ -16,6 +16,11 @@
  */
 
 import type { Customer } from "@/types/customer";
+// Static import so the seed data is bundled at build time.
+// On Vercel, fs.readFileSync() cannot access files outside the function bundle,
+// so we must import the JSON directly — this is always available.
+import seedData from "@/data/customers.json";
+
 
 const REDIS_KEY = "crm:customers";
 
@@ -129,15 +134,17 @@ export async function readCustomers(): Promise<Customer[]> {
 
     if (data !== null) return data;
 
-    // Redis is empty on first deploy — seed it from the committed JSON file
-    const seed = fsReadCustomers();
+    // Redis is empty on first deploy — seed it from the bundled JSON.
+    // We use the static import (not fsReadCustomers) so this works on Vercel
+    // where the serverless function cannot access arbitrary filesystem paths.
+    const seed = seedData as Customer[];
     if (seed.length > 0) {
       await redisSet(seed);
     }
     return seed;
   }
 
-  // Local filesystem fallback
+  // Local filesystem fallback (no Redis configured — development only)
   return fsReadCustomers();
 }
 
