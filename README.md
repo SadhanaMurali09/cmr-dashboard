@@ -155,10 +155,42 @@ crm-dashboard/
 
 ## 🏗 Architecture Notes
 
-- **Mock API**: `lib/customers-api.ts` simulates network latency (350 ms fetch, 200 ms mutate). Swap `fetchCustomers`, `addCustomer`, `updateCustomer`, `deleteCustomer` for real API calls — the rest of the app is unchanged.
-- **Optimistic updates**: Mutations call `queryClient.setQueryData` on success to update the cache directly, making the UI feel instant without a refetch.
-- **Drag order is page-scoped**: Customer row ordering lives in `pageOrder` state inside `CustomerList`. It resets on filter/sort/page changes by design — the source of truth remains the server data.
-- **Filter persistence**: Saved filters are stored in `localStorage` under `crm-saved-filters`. Template filters (Active Customers, Recent Contacts, Inactive Leads) are hard-coded and cannot be deleted or reordered.
+### Data Persistence — Shared Server-Side Database
+
+Customer data is now stored in **`data/customers.json`** on the server and served through Next.js API Route Handlers. This enables full multi-device synchronisation:
+
+- **`data/customers.json`** — The shared persistent database. Committed to the repo so deployments start with the 36 seed customers. Updated on every CRUD operation.
+- **`lib/db.ts`** — Server-only helper that reads/writes `customers.json` atomically (write → temp file → rename to prevent corruption).
+- **`app/api/customers/route.ts`** — `GET /api/customers` and `POST /api/customers`.
+- **`app/api/customers/[id]/route.ts`** — `PUT /api/customers/:id` and `DELETE /api/customers/:id`.
+- **`lib/customers-api.ts`** — Client-side `fetch()` wrappers that call the above routes. The `apiBase()` helper uses a relative path (`/api/customers`) on the client and `NEXT_PUBLIC_APP_URL` during SSR.
+
+### Multi-Device Flow
+1. All devices call `GET /api/customers` — they all read from the same `customers.json` file on the server.
+2. When Device B calls `POST /api/customers`, the server appends the new customer to `customers.json` and returns the created record.
+3. TanStack Query on Device A polls every **30 seconds** (`refetchInterval: 30_000`) and picks up the new customer automatically. Manual refresh also works.
+
+### Environment Variables (Production)
+
+| Variable | Required | Description |
+|---|---|---|
+| `NEXT_PUBLIC_APP_URL` | SSR only | Absolute URL of the deployed app (e.g. `https://crm.yoursite.com`). Only needed if you call API routes during server-side rendering. Client-side fetch uses relative paths and does not need this. |
+
+### Deployment Notes
+
+- **Railway / Render / Fly.io / VPS** — Works out of the box. The `data/` directory is part of the deployment and `customers.json` is writable.
+- **Vercel** — Vercel's filesystem is read-only after deployment. To deploy to Vercel, replace `lib/db.ts` with Vercel KV (free tier). The API interface stays identical — only the read/write implementation changes.
+
+### TanStack Query Strategy
+
+- **`staleTime: 0`** — data is always considered stale so mutations immediately trigger a server refetch.
+- **`refetchInterval: 30_000`** — automatic background polling every 30 seconds for cross-device sync.
+- Mutations call `setQueryData` for instant UI feedback, then `invalidateQueries` to pull fresh server data.
+- Dashboard statistics (`Total Customers`, `Active`, `Leads`, `Inactive/Churned`) are calculated dynamically from the live query cache — never hardcoded.
+
+### Filter Persistence
+
+Saved filters are stored in `localStorage` under `crm-saved-filters`. This is intentional — filter preferences are user-specific and do not need to be shared across devices.
 
 ---
 

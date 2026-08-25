@@ -20,18 +20,26 @@ export function useAddCustomer() {
 
   return useMutation({
     mutationFn: (data: CustomerInput) => addCustomer(data),
-    onSuccess: (updatedList: Customer[]) => {
-      // Immediately update the in-memory cache for all subscribers
-      queryClient.setQueryData(customersQueryKey, updatedList);
-      // Mark as stale so any background refetch gets fresh localStorage data
+
+    onSuccess: (newCustomer: Customer) => {
+      // Append the new customer to the cached list immediately so the UI
+      // updates without waiting for the next poll cycle.
+      queryClient.setQueryData<Customer[]>(
+        customersQueryKey,
+        (prev) => (prev ? [...prev, newCustomer] : [newCustomer])
+      );
+      // Invalidate so the next background refetch pulls fresh server data,
+      // ensuring Dashboard stats and all devices stay in sync.
       void queryClient.invalidateQueries({ queryKey: customersQueryKey });
+
       toast.success("Customer added", {
-        description: "The new customer has been added to your directory.",
+        description: "The new customer has been saved to the shared database.",
       });
     },
-    onError: () => {
+
+    onError: (err: Error) => {
       toast.error("Failed to add customer", {
-        description: "Something went wrong. Please try again.",
+        description: err.message || "Something went wrong. Please try again.",
       });
     },
   });
@@ -45,16 +53,26 @@ export function useUpdateCustomer() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CustomerInput> }) =>
       updateCustomer(id, data),
-    onSuccess: (updatedList: Customer[]) => {
-      queryClient.setQueryData(customersQueryKey, updatedList);
+
+    onSuccess: (updatedCustomer: Customer) => {
+      // Replace only the updated customer in the cache
+      queryClient.setQueryData<Customer[]>(
+        customersQueryKey,
+        (prev) =>
+          prev?.map((c) =>
+            c.id === updatedCustomer.id ? updatedCustomer : c
+          ) ?? []
+      );
       void queryClient.invalidateQueries({ queryKey: customersQueryKey });
+
       toast.success("Customer updated", {
         description: "The customer's details have been saved.",
       });
     },
-    onError: () => {
+
+    onError: (err: Error) => {
       toast.error("Failed to update customer", {
-        description: "Something went wrong. Please try again.",
+        description: err.message || "Something went wrong. Please try again.",
       });
     },
   });
@@ -67,16 +85,23 @@ export function useDeleteCustomer() {
 
   return useMutation({
     mutationFn: (id: string) => deleteCustomer(id),
-    onSuccess: (updatedList: Customer[]) => {
-      queryClient.setQueryData(customersQueryKey, updatedList);
+
+    onSuccess: (_result, id: string) => {
+      // Optimistically remove the deleted customer from the cache
+      queryClient.setQueryData<Customer[]>(
+        customersQueryKey,
+        (prev) => prev?.filter((c) => c.id !== id) ?? []
+      );
       void queryClient.invalidateQueries({ queryKey: customersQueryKey });
+
       toast.success("Customer deleted", {
-        description: "The customer has been removed from your directory.",
+        description: "The customer has been removed from the shared database.",
       });
     },
-    onError: () => {
+
+    onError: (err: Error) => {
       toast.error("Failed to delete customer", {
-        description: "Something went wrong. Please try again.",
+        description: err.message || "Something went wrong. Please try again.",
       });
     },
   });
@@ -89,12 +114,13 @@ export function useReorderCustomers() {
 
   return useMutation({
     mutationFn: (ordered: Customer[]) => reorderCustomers(ordered),
-    onSuccess: (updatedList: Customer[]) => {
-      queryClient.setQueryData(customersQueryKey, updatedList);
-      // No invalidation needed for reorder — order change doesn't affect Dashboard stats
+
+    onSuccess: (ordered: Customer[]) => {
+      // Update cache with the reordered list (cosmetic — not persisted to server)
+      queryClient.setQueryData(customersQueryKey, ordered);
     },
+
     // Silent on error — drag order is cosmetic, don't distract user with toasts
     onError: () => {},
   });
 }
-

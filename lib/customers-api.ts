@@ -1,80 +1,123 @@
 /**
- * customers-api.ts
+ * lib/customers-api.ts
  *
- * Simulated customer API backed by localStorage (via customer-storage.ts).
- * Data now survives page refreshes. The in-memory mock store in
- * data/mock-customers.ts is only used as the seed for the first visit.
+ * Real HTTP client for the /api/customers route handlers.
+ * All data is fetched from and persisted to the shared server-side JSON
+ * database — not localStorage. This means all devices see the same data.
  *
- * All functions are async to keep the same interface expected by TanStack
- * Query and the mutation hooks — allowing a real HTTP backend to be swapped
- * in later with zero changes to the hooks layer.
+ * The async interface is identical to the old mock version so the hooks
+ * layer (use-customers.ts, use-customer-mutations.ts) requires no changes
+ * to its call signatures.
  */
 
 import type { Customer } from "@/types/customer";
-import { loadCustomers, saveCustomers } from "@/lib/customer-storage";
-
-const FETCH_DELAY_MS = 350;
-const MUTATE_DELAY_MS = 200;
-
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-/** Simulated customer API — localStorage-backed, no backend. */
-export async function fetchCustomers(): Promise<Customer[]> {
-  await delay(FETCH_DELAY_MS);
-  return structuredClone(loadCustomers());
-}
 
 export type CustomerInput = Omit<Customer, "id" | "createdAt">;
 
-/** Add a new customer. Persists to localStorage. Returns the full updated list. */
-export async function addCustomer(data: CustomerInput): Promise<Customer[]> {
-  await delay(MUTATE_DELAY_MS);
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-  const current = loadCustomers();
-  const newCustomer: Customer = {
-    ...data,
-    id: `cus_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-    createdAt: new Date().toISOString(),
-  };
-
-  const updated = [...current, newCustomer];
-  saveCustomers(updated);
-  return structuredClone(updated);
+/**
+ * Resolve the API base URL correctly in both browser and server contexts.
+ *
+ * - In the browser: relative paths work fine ("/api/customers").
+ * - During Next.js SSR/SSG: relative paths have no base, so we need an
+ *   absolute URL. NEXT_PUBLIC_APP_URL must be set in production deployments.
+ *   Falls back to http://localhost:3000 for local development.
+ */
+function apiBase(): string {
+  if (typeof window !== "undefined") {
+    // Client-side: use relative path — always resolves to the same origin
+    return "";
+  }
+  // Server-side: must use absolute URL
+  return (
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+    "http://localhost:3000"
+  );
 }
 
-/** Update an existing customer. Persists to localStorage. Returns the full updated list. */
+async function handleResponse<T>(res: Response): Promise<T> {
+  if (!res.ok) {
+    let message = `API error ${res.status}`;
+    try {
+      const json = (await res.json()) as { error?: string };
+      if (json.error) message = json.error;
+    } catch {
+      // non-JSON error body — ignore
+    }
+    throw new Error(message);
+  }
+  return res.json() as Promise<T>;
+}
+
+// ─── GET /api/customers ───────────────────────────────────────────────────────
+
+/** Fetch all customers from the shared server-side database. */
+export async function fetchCustomers(): Promise<Customer[]> {
+  const res = await fetch(`${apiBase()}/api/customers`, {
+    // Always go to the server — never serve a stale cached response.
+    cache: "no-store",
+  });
+  return handleResponse<Customer[]>(res);
+}
+
+// ─── POST /api/customers ──────────────────────────────────────────────────────
+
+/**
+ * Create a new customer.
+ * Returns the newly created Customer object (with id + createdAt from server).
+ */
+export async function addCustomer(data: CustomerInput): Promise<Customer> {
+  const res = await fetch(`${apiBase()}/api/customers`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse<Customer>(res);
+}
+
+// ─── PUT /api/customers/:id ───────────────────────────────────────────────────
+
+/**
+ * Update an existing customer by ID.
+ * Returns the updated Customer object.
+ */
 export async function updateCustomer(
   id: string,
   data: Partial<CustomerInput>
-): Promise<Customer[]> {
-  await delay(MUTATE_DELAY_MS);
-
-  const updated = loadCustomers().map((c) =>
-    c.id === id ? { ...c, ...data } : c
-  );
-  saveCustomers(updated);
-  return structuredClone(updated);
+): Promise<Customer> {
+  const res = await fetch(`${apiBase()}/api/customers/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse<Customer>(res);
 }
 
-/** Delete a customer by id. Persists to localStorage. Returns the full updated list. */
-export async function deleteCustomer(id: string): Promise<Customer[]> {
-  await delay(MUTATE_DELAY_MS);
+// ─── DELETE /api/customers/:id ────────────────────────────────────────────────
 
-  const updated = loadCustomers().filter((c) => c.id !== id);
-  saveCustomers(updated);
-  return structuredClone(updated);
+/** Delete a customer by ID. Returns the deleted customer's id on success. */
+export async function deleteCustomer(id: string): Promise<{ id: string }> {
+  const res = await fetch(`${apiBase()}/api/customers/${id}`, {
+    method: "DELETE",
+  });
+  return handleResponse<{ id: string }>(res);
 }
+
+// ─── Reorder (client-side only — no server persistence needed) ────────────────
 
 /**
- * Persist a reordered customer list (e.g. after drag-and-drop).
- * Returns the persisted list.
+ * Reorder is purely cosmetic (drag-and-drop row order within the current page).
+ * The order is not persisted to the server — it resets when the query refetches,
+ * which is by design (server order = insertion order = most predictable).
+ *
+ * We keep this function so useReorderCustomers mutation still compiles without
+ * changes. It is a no-op on the server side.
  */
 export async function reorderCustomers(
   ordered: Customer[]
 ): Promise<Customer[]> {
-  await delay(MUTATE_DELAY_MS);
-  saveCustomers(ordered);
-  return structuredClone(ordered);
+  // No API call — reorder is handled entirely in the TanStack Query cache
+  // by useReorderCustomers setting query data directly.
+  return ordered;
 }
