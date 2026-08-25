@@ -51,7 +51,7 @@ export async function PUT(request: Request, context: RouteContext) {
       );
     }
 
-    const customers = readCustomers();
+    const customers = await readCustomers();
     const index = customers.findIndex((c) => c.id === id);
 
     if (index === -1) {
@@ -66,7 +66,7 @@ export async function PUT(request: Request, context: RouteContext) {
     const updated = [...customers];
     updated[index] = updatedCustomer;
 
-    writeCustomers(updated);
+    await writeCustomers(updated);
 
     return NextResponse.json(updatedCustomer, { status: 200 });
 
@@ -85,7 +85,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
   try {
     const { id } = await context.params;
 
-    const customers = readCustomers();
+    const customers = await readCustomers();
     const exists = customers.some((c) => c.id === id);
 
     if (!exists) {
@@ -96,7 +96,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
     }
 
     const updated = customers.filter((c) => c.id !== id);
-    writeCustomers(updated);
+    await writeCustomers(updated);
 
     return NextResponse.json({ success: true, id }, { status: 200 });
   } catch (err) {

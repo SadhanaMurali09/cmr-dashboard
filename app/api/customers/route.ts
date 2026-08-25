@@ -40,7 +40,7 @@ const CustomerInputSchema = z.object({
 
 export async function GET() {
   try {
-    const customers = readCustomers();
+    const customers = await readCustomers();
     return NextResponse.json(customers, { status: 200 });
   } catch (err) {
     console.error("[GET /api/customers]", err);
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
     };
 
     // Read → append → write (server-side, atomic)
-    const current = readCustomers();
+    const current = await readCustomers();
 
     // Guard: do not allow duplicate emails
     const duplicate = current.find(
@@ -90,7 +90,7 @@ export async function POST(request: Request) {
     }
 
     const updated = [...current, newCustomer];
-    writeCustomers(updated);
+    await writeCustomers(updated);
 
     return NextResponse.json(newCustomer, { status: 201 });
   } catch (err) {
