@@ -17,12 +17,23 @@ const CustomerInputSchema = z.object({
   name: z.string().min(1, "Name is required").max(200),
   email: z.string().email("Invalid email address"),
   phone: z.string().min(1, "Phone is required").max(50),
-  company: z.string().max(200).optional(),
+  // Empty string from the form → treat as absent (undefined)
+  company: z
+    .string()
+    .max(200)
+    .optional()
+    .transform((v) => (v === "" ? undefined : v)),
   status: z.enum(["active", "inactive", "lead", "churned"]),
   lastContact: z.string().min(1, "Last contact date is required"),
-  dealValue: z.number().positive().optional(),
+  // dealValue may be undefined (no deal entered)
+  dealValue: z.number().nonnegative().optional(),
   dealCurrency: z.enum(["INR", "USD"]).optional(),
-  notes: z.string().max(2000).optional(),
+  // Empty string from the form → treat as absent (undefined)
+  notes: z
+    .string()
+    .max(2000)
+    .optional()
+    .transform((v) => (v === "" ? undefined : v)),
 });
 
 // ─── GET /api/customers ───────────────────────────────────────────────────────

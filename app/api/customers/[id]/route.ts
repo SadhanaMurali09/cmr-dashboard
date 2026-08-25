@@ -16,12 +16,20 @@ const CustomerUpdateSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   email: z.string().email().optional(),
   phone: z.string().min(1).max(50).optional(),
-  company: z.string().max(200).optional(),
+  company: z
+    .string()
+    .max(200)
+    .optional()
+    .transform((v) => (v === "" ? undefined : v)),
   status: z.enum(["active", "inactive", "lead", "churned"]).optional(),
   lastContact: z.string().optional(),
-  dealValue: z.number().positive().optional(),
+  dealValue: z.number().nonnegative().optional(),
   dealCurrency: z.enum(["INR", "USD"]).optional(),
-  notes: z.string().max(2000).optional(),
+  notes: z
+    .string()
+    .max(2000)
+    .optional()
+    .transform((v) => (v === "" ? undefined : v)),
 });
 
 // ─── Route context type ───────────────────────────────────────────────────────
