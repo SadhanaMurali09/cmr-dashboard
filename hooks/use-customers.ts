@@ -10,6 +10,6 @@ export function useCustomers() {
   return useQuery({
     queryKey: customersQueryKey,
     queryFn: fetchCustomers,
-    staleTime: 30_000, // don't refetch for 30 s on navigation
+    staleTime: 0, // always read fresh — mutations use setQueryData to push updates instantly
   });
 }

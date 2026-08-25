@@ -36,7 +36,7 @@ export function filterCustomersBySearch(
   }
 
   return customers.filter((customer) => {
-    const haystack = [customer.name, customer.email, customer.company]
+    const haystack = [customer.name, customer.email, customer.company ?? ""]
       .join(" ")
       .toLowerCase();
 
@@ -57,12 +57,13 @@ export function sortCustomers(
 
     if (sortKey === "lastContact") {
       return (
-        (new Date(left).getTime() - new Date(right).getTime()) * direction
+        (new Date(left ?? "").getTime() - new Date(right ?? "").getTime()) *
+        direction
       );
     }
 
     return (
-      String(left).localeCompare(String(right), undefined, {
+      String(left ?? "").localeCompare(String(right ?? ""), undefined, {
         sensitivity: "base",
         numeric: true,
       }) * direction
@@ -145,7 +146,7 @@ export function filterCustomersByAdvanced(
 
   return customers.filter((c) => {
     if (hasStatusFilter && !filters.statuses.includes(c.status)) return false;
-    if (hasCompanyFilter && !filters.companies.includes(c.company)) return false;
+    if (hasCompanyFilter && !filters.companies.includes(c.company ?? "")) return false;
 
     const lastContact = new Date(c.lastContact);
     if (dateFrom && lastContact < dateFrom) return false;

@@ -13,7 +13,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60_000,
+            staleTime: 0,           // always refetch on mount — mutations keep cache hot via setQueryData
             refetchOnWindowFocus: false,
           },
         },

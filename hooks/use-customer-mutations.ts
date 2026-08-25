@@ -21,7 +21,10 @@ export function useAddCustomer() {
   return useMutation({
     mutationFn: (data: CustomerInput) => addCustomer(data),
     onSuccess: (updatedList: Customer[]) => {
+      // Immediately update the in-memory cache for all subscribers
       queryClient.setQueryData(customersQueryKey, updatedList);
+      // Mark as stale so any background refetch gets fresh localStorage data
+      void queryClient.invalidateQueries({ queryKey: customersQueryKey });
       toast.success("Customer added", {
         description: "The new customer has been added to your directory.",
       });
@@ -44,6 +47,7 @@ export function useUpdateCustomer() {
       updateCustomer(id, data),
     onSuccess: (updatedList: Customer[]) => {
       queryClient.setQueryData(customersQueryKey, updatedList);
+      void queryClient.invalidateQueries({ queryKey: customersQueryKey });
       toast.success("Customer updated", {
         description: "The customer's details have been saved.",
       });
@@ -65,6 +69,7 @@ export function useDeleteCustomer() {
     mutationFn: (id: string) => deleteCustomer(id),
     onSuccess: (updatedList: Customer[]) => {
       queryClient.setQueryData(customersQueryKey, updatedList);
+      void queryClient.invalidateQueries({ queryKey: customersQueryKey });
       toast.success("Customer deleted", {
         description: "The customer has been removed from your directory.",
       });
@@ -86,8 +91,10 @@ export function useReorderCustomers() {
     mutationFn: (ordered: Customer[]) => reorderCustomers(ordered),
     onSuccess: (updatedList: Customer[]) => {
       queryClient.setQueryData(customersQueryKey, updatedList);
+      // No invalidation needed for reorder — order change doesn't affect Dashboard stats
     },
     // Silent on error — drag order is cosmetic, don't distract user with toasts
     onError: () => {},
   });
 }
+

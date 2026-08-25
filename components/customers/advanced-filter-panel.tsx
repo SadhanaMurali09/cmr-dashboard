@@ -200,9 +200,10 @@ export function AdvancedFilterPanel({ customers, hook }: AdvancedFilterPanelProp
   const [saveNameInput, setSaveNameInput] = useState("");
   const [companyOpen, setCompanyOpen] = useState(false);
 
-  // Unique company list derived from all customers
+  // Unique company list derived from all customers (filter out blank/undefined)
   const allCompanies = useMemo(
-    () => [...new Set(customers.map((c) => c.company))].sort(),
+    () =>
+      [...new Set(customers.map((c) => c.company ?? "").filter(Boolean))].sort(),
     [customers]
   );
 

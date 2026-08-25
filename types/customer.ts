@@ -7,7 +7,7 @@ export interface Customer {
   name: string;
   email: string;
   phone: string;
-  company: string;
+  company?: string;
   status: CustomerStatus;
   createdAt: string;
   lastContact: string;

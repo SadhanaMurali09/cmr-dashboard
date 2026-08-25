@@ -75,7 +75,7 @@ export default function DashboardPage() {
                       {customer.name}
                     </p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {customer.company} · {formatCustomerDate(customer.createdAt)}
+                      {customer.company ?? ""} · {formatCustomerDate(customer.createdAt)}
                     </p>
                   </div>
                 </div>

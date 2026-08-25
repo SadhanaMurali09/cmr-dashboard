@@ -83,7 +83,7 @@ export function DraggableCustomerCard({
             <div className="min-w-0">
               <p className="truncate font-medium">{customer.name}</p>
               <p className="truncate text-xs text-muted-foreground">
-                {customer.company}
+                {customer.company ?? ""}
               </p>
             </div>
           </div>

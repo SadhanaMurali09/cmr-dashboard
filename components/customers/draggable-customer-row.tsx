@@ -90,7 +90,7 @@ export function DraggableCustomerRow({
       <TableCell className="text-muted-foreground">{customer.phone}</TableCell>
 
       {/* Company */}
-      <TableCell className="text-muted-foreground">{customer.company}</TableCell>
+      <TableCell className="text-muted-foreground">{customer.company ?? ""}</TableCell>
 
       {/* Status */}
       <TableCell>

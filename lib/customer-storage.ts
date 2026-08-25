@@ -48,11 +48,11 @@ export function loadCustomers(): Customer[] {
 
     const parsed: unknown = JSON.parse(raw);
 
-    if (Array.isArray(parsed) && parsed.length > 0) {
+    if (Array.isArray(parsed)) {
       return parsed as Customer[];
     }
 
-    // Stored value is an empty array or unexpected shape — re-seed.
+    // Stored value is not a valid array — re-seed.
     const seed = getMockCustomers();
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seed));
     return seed;
@@ -66,6 +66,9 @@ export function loadCustomers(): Customer[] {
       return getMockCustomers();
     }
   }
+
+  // TypeScript control flow safety — unreachable in practice.
+  return getMockCustomers();
 }
 
 /**
