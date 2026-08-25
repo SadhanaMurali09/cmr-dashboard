@@ -56,19 +56,27 @@ async function redisSet(customers: Customer[]): Promise<void> {
   const url = process.env.UPSTASH_REDIS_REST_URL!;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN!;
 
+  // Upstash REST /set/{key} — POST body is the raw string VALUE to store.
+  // We send a single JSON.stringify so the stored value is a valid JSON array
+  // string that redisGet() can JSON.parse back to Customer[].
+  // ⚠️ Do NOT double-stringify: JSON.stringify(JSON.stringify(...)) would store
+  //    an extra layer of quotes and break the parse on GET.
+  const serialised = JSON.stringify(customers);
+
   const res = await fetch(`${url}/set/${REDIS_KEY}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
+      // text/plain tells Upstash to store the body as-is (a JSON string)
+      "Content-Type": "text/plain",
     },
-    body: JSON.stringify(JSON.stringify(customers)), // Upstash REST: value must be a JSON string
+    body: serialised,
   });
 
   if (!res.ok) {
     const text = await res.text();
     console.error("[db/redis] SET failed:", res.status, text);
-    throw new Error(`Redis SET failed: ${res.status}`);
+    throw new Error(`Redis SET failed (${res.status}): ${text}`);
   }
 }
 
@@ -140,6 +148,18 @@ export async function writeCustomers(customers: Customer[]): Promise<void> {
   if (isRedisConfigured()) {
     await redisSet(customers);
     return;
+  }
+
+  // On Vercel (and most serverless platforms) the filesystem is read-only.
+  // If Redis is not configured, writes will throw EROFS which surfaces as a
+  // confusing "Failed to create customer" 500 error.
+  // Detect this case early and throw a descriptive error instead.
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "Database not configured: set UPSTASH_REDIS_REST_URL and " +
+      "UPSTASH_REDIS_REST_TOKEN in your Vercel environment variables. " +
+      "See .env.local.example for details."
+    );
   }
 
   fsWriteCustomers(customers);

@@ -94,9 +94,34 @@ export async function POST(request: Request) {
 
     return NextResponse.json(newCustomer, { status: 201 });
   } catch (err) {
-    console.error("[POST /api/customers]", err);
+    const message =
+      err instanceof Error ? err.message : "Failed to create customer";
+
+    // Log the full error server-side (visible in Vercel Function logs)
+    console.error("[POST /api/customers] Error:", message, err);
+
+    // Detect the "database not configured" case and return a 503
+    if (message.includes("UPSTASH_REDIS_REST_URL") || message.includes("Database not configured")) {
+      return NextResponse.json(
+        {
+          error:
+            "Database not configured. Please set UPSTASH_REDIS_REST_URL and " +
+            "UPSTASH_REDIS_REST_TOKEN in your Vercel environment variables.",
+        },
+        { status: 503 }
+      );
+    }
+
+    // Detect Redis write failures
+    if (message.includes("Redis SET failed")) {
+      return NextResponse.json(
+        { error: `Database write failed: ${message}` },
+        { status: 502 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Failed to create customer" },
+      { error: message },
       { status: 500 }
     );
   }
