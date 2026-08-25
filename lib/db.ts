@@ -26,16 +26,24 @@ const REDIS_KEY = "crm:customers";
 
 // ─── Upstash Redis helpers ────────────────────────────────────────────────────
 
+// Vercel Upstash integration creates KV_REST_API_URL / KV_REST_API_TOKEN.
+// Manual setup uses UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN.
+// We support both so the code works with either approach.
+function getRedisUrl(): string | undefined {
+  return process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+}
+
+function getRedisToken(): string | undefined {
+  return process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+}
+
 function isRedisConfigured(): boolean {
-  return (
-    !!process.env.UPSTASH_REDIS_REST_URL &&
-    !!process.env.UPSTASH_REDIS_REST_TOKEN
-  );
+  return !!getRedisUrl() && !!getRedisToken();
 }
 
 async function redisGet(): Promise<Customer[] | null> {
-  const url = process.env.UPSTASH_REDIS_REST_URL!;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN!;
+  const url = getRedisUrl()!;
+  const token = getRedisToken()!;
 
   const res = await fetch(`${url}/get/${REDIS_KEY}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -58,8 +66,8 @@ async function redisGet(): Promise<Customer[] | null> {
 }
 
 async function redisSet(customers: Customer[]): Promise<void> {
-  const url = process.env.UPSTASH_REDIS_REST_URL!;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN!;
+  const url = getRedisUrl()!;
+  const token = getRedisToken()!;
 
   // Upstash REST /set/{key} — POST body is the raw string VALUE to store.
   // We send a single JSON.stringify so the stored value is a valid JSON array
