@@ -6,7 +6,8 @@ import {
   DndContext,
   DragOverlay,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   type DragEndEvent,
@@ -110,8 +111,14 @@ export function CustomerList() {
 
   // ── DnD sensors ─────────────────────────────────────────────────────────────
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 }, // prevent accidental drag on click
+    useSensor(MouseSensor, {
+      activationConstraint: { distance: 5 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 180,
+        tolerance: 8,
+      },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
@@ -168,6 +175,10 @@ export function CustomerList() {
   // ── DnD handlers ────────────────────────────────────────────────────────────
   function handleDragStart(event: DragStartEvent) {
     setActiveId(String(event.active.id));
+  }
+
+  function handleDragCancel() {
+    setActiveId(null);
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -504,6 +515,7 @@ export function CustomerList() {
                 sensors={sensors}
                 collisionDetection={closestCenter}
                 onDragStart={handleDragStart}
+                onDragCancel={handleDragCancel}
                 onDragEnd={handleDragEnd}
               >
                 {/* Desktop table */}

@@ -104,20 +104,20 @@ export async function deleteCustomer(id: string): Promise<{ id: string }> {
   return handleResponse<{ id: string }>(res);
 }
 
-// ─── Reorder (client-side only — no server persistence needed) ────────────────
+// ─── Reorder (persist to shared server-side list order) ────────────────────
 
 /**
- * Reorder is purely cosmetic (drag-and-drop row order within the current page).
- * The order is not persisted to the server — it resets when the query refetches,
- * which is by design (server order = insertion order = most predictable).
- *
- * We keep this function so useReorderCustomers mutation still compiles without
- * changes. It is a no-op on the server side.
+ * Persist the new customer order to the shared server-side database so the
+ * drag-and-drop reorder survives refreshes and other devices.
  */
 export async function reorderCustomers(
   ordered: Customer[]
 ): Promise<Customer[]> {
-  // No API call — reorder is handled entirely in the TanStack Query cache
-  // by useReorderCustomers setting query data directly.
-  return ordered;
+  const res = await fetch(`${apiBase()}/api/customers/reorder`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(ordered),
+  });
+
+  return handleResponse<Customer[]>(res);
 }

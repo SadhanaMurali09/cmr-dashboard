@@ -1,5 +1,17 @@
 [
   {
+    "id": "cus_036",
+    "name": "Aaron Scott",
+    "email": "aaron.scott@pixelbay.app",
+    "phone": "+1 (702) 555-0196",
+    "company": "PixelBay",
+    "status": "lead",
+    "createdAt": "2026-08-01T12:50:00.000Z",
+    "lastContact": "2026-08-17T08:30:00.000Z",
+    "dealValue": 4900,
+    "dealCurrency": "USD"
+  },
+  {
     "id": "cus_001",
     "name": "Ava Thompson",
     "email": "ava.thompson@northwind.io",
@@ -11,6 +23,103 @@
     "dealValue": 2050000,
     "dealCurrency": "INR",
     "notes": "Long-term partner. Interested in the enterprise plan upgrade. Follow up after Q3 review."
+  },
+  {
+    "id": "cus_021",
+    "name": "Amelia Foster",
+    "email": "amelia.foster@blueorbit.com",
+    "phone": "+919123456789",
+    "company": "Blue Orbit",
+    "status": "active",
+    "createdAt": "2026-02-28T13:35:00.000Z",
+    "lastContact": "2026-08-19T07:45:00.000Z",
+    "dealValue": 3450000,
+    "dealCurrency": "INR"
+  },
+  {
+    "id": "cus_028",
+    "name": "Benjamin Cruz",
+    "email": "benjamin.cruz@solarstack.com",
+    "phone": "+1 (602) 555-0151",
+    "company": "SolarStack",
+    "status": "active",
+    "createdAt": "2025-11-05T18:00:00.000Z",
+    "lastContact": "2026-08-14T18:25:00.000Z",
+    "dealValue": 29300,
+    "dealCurrency": "USD"
+  },
+  {
+    "id": "cus_016",
+    "name": "Carter Hayes",
+    "email": "carter.hayes@steelpath.dev",
+    "phone": "+1 (704) 555-0139",
+    "company": "SteelPath",
+    "status": "active",
+    "createdAt": "2025-11-30T09:50:00.000Z",
+    "lastContact": "2026-08-08T10:55:00.000Z",
+    "dealValue": 33600,
+    "dealCurrency": "USD"
+  },
+  {
+    "id": "cus_011",
+    "name": "Chloe Martin",
+    "email": "chloe.martin@pinecrest.io",
+    "phone": "+1 (512) 555-0191",
+    "company": "Pinecrest Systems",
+    "status": "lead",
+    "createdAt": "2026-04-11T12:41:00.000Z",
+    "lastContact": "2026-08-14T09:35:00.000Z",
+    "dealValue": 540000,
+    "dealCurrency": "INR"
+  },
+  {
+    "id": "cus_030",
+    "name": "Daniel Park",
+    "email": "daniel.park@keplerdesk.com",
+    "phone": "+1 (425) 555-0136",
+    "company": "Kepler Desk",
+    "status": "active",
+    "createdAt": "2026-01-15T15:55:00.000Z",
+    "lastContact": "2026-08-10T14:15:00.000Z",
+    "dealValue": 38700,
+    "dealCurrency": "USD"
+  },
+  {
+    "id": "cus_010",
+    "name": "Diego Morales",
+    "email": "diego.morales@cascadehq.com",
+    "phone": "+1 (213) 555-0107",
+    "company": "Cascade HQ",
+    "status": "active",
+    "createdAt": "2026-01-27T14:03:00.000Z",
+    "lastContact": "2026-08-16T15:50:00.000Z",
+    "dealValue": 45000,
+    "dealCurrency": "USD",
+    "notes": "Key account. VIP treatment required. Scheduled for annual business review in September."
+  },
+  {
+    "id": "cus_029",
+    "name": "Elena Popov",
+    "email": "elena.popov@citrineops.io",
+    "phone": "+919000012345",
+    "company": "Citrine Ops",
+    "status": "lead",
+    "createdAt": "2026-06-28T11:40:00.000Z",
+    "lastContact": "2026-08-18T09:50:00.000Z",
+    "dealValue": 865000,
+    "dealCurrency": "INR"
+  },
+  {
+    "id": "cus_005",
+    "name": "Emily Brooks",
+    "email": "emily.brooks@lumenforge.com",
+    "phone": "+1 (503) 555-0166",
+    "company": "LumenForge",
+    "status": "active",
+    "createdAt": "2026-02-14T11:30:00.000Z",
+    "lastContact": "2026-08-19T08:05:00.000Z",
+    "dealValue": 19750,
+    "dealCurrency": "USD"
   },
   {
     "id": "cus_002",
@@ -47,18 +156,6 @@
     "createdAt": "2025-06-21T19:05:00.000Z",
     "lastContact": "2026-05-02T11:30:00.000Z",
     "notes": "No response to last three outreach attempts. May need to re-engage with new offer."
-  },
-  {
-    "id": "cus_005",
-    "name": "Emily Brooks",
-    "email": "emily.brooks@lumenforge.com",
-    "phone": "+1 (503) 555-0166",
-    "company": "LumenForge",
-    "status": "active",
-    "createdAt": "2026-02-14T11:30:00.000Z",
-    "lastContact": "2026-08-19T08:05:00.000Z",
-    "dealValue": 19750,
-    "dealCurrency": "USD"
   },
   {
     "id": "cus_006",
@@ -104,31 +201,6 @@
     "status": "inactive",
     "createdAt": "2025-08-29T07:18:00.000Z",
     "lastContact": "2026-06-22T10:15:00.000Z"
-  },
-  {
-    "id": "cus_010",
-    "name": "Diego Morales",
-    "email": "diego.morales@cascadehq.com",
-    "phone": "+1 (213) 555-0107",
-    "company": "Cascade HQ",
-    "status": "active",
-    "createdAt": "2026-01-27T14:03:00.000Z",
-    "lastContact": "2026-08-16T15:50:00.000Z",
-    "dealValue": 45000,
-    "dealCurrency": "USD",
-    "notes": "Key account. VIP treatment required. Scheduled for annual business review in September."
-  },
-  {
-    "id": "cus_011",
-    "name": "Chloe Martin",
-    "email": "chloe.martin@pinecrest.io",
-    "phone": "+1 (512) 555-0191",
-    "company": "Pinecrest Systems",
-    "status": "lead",
-    "createdAt": "2026-04-11T12:41:00.000Z",
-    "lastContact": "2026-08-14T09:35:00.000Z",
-    "dealValue": 540000,
-    "dealCurrency": "INR"
   },
   {
     "id": "cus_012",
@@ -177,18 +249,6 @@
     "lastContact": "2026-04-28T16:40:00.000Z"
   },
   {
-    "id": "cus_016",
-    "name": "Carter Hayes",
-    "email": "carter.hayes@steelpath.dev",
-    "phone": "+1 (704) 555-0139",
-    "company": "SteelPath",
-    "status": "active",
-    "createdAt": "2025-11-30T09:50:00.000Z",
-    "lastContact": "2026-08-08T10:55:00.000Z",
-    "dealValue": 33600,
-    "dealCurrency": "USD"
-  },
-  {
     "id": "cus_017",
     "name": "Zoe Nguyen",
     "email": "zoe.nguyen@mintwave.co",
@@ -232,18 +292,6 @@
     "status": "inactive",
     "createdAt": "2025-09-25T17:40:00.000Z",
     "lastContact": "2026-07-03T08:25:00.000Z"
-  },
-  {
-    "id": "cus_021",
-    "name": "Amelia Foster",
-    "email": "amelia.foster@blueorbit.com",
-    "phone": "+919123456789",
-    "company": "Blue Orbit",
-    "status": "active",
-    "createdAt": "2026-02-28T13:35:00.000Z",
-    "lastContact": "2026-08-19T07:45:00.000Z",
-    "dealValue": 3450000,
-    "dealCurrency": "INR"
   },
   {
     "id": "cus_022",
@@ -314,42 +362,6 @@
     "lastContact": "2026-06-15T13:55:00.000Z"
   },
   {
-    "id": "cus_028",
-    "name": "Benjamin Cruz",
-    "email": "benjamin.cruz@solarstack.com",
-    "phone": "+1 (602) 555-0151",
-    "company": "SolarStack",
-    "status": "active",
-    "createdAt": "2025-11-05T18:00:00.000Z",
-    "lastContact": "2026-08-14T18:25:00.000Z",
-    "dealValue": 29300,
-    "dealCurrency": "USD"
-  },
-  {
-    "id": "cus_029",
-    "name": "Elena Popov",
-    "email": "elena.popov@citrineops.io",
-    "phone": "+919000012345",
-    "company": "Citrine Ops",
-    "status": "lead",
-    "createdAt": "2026-06-28T11:40:00.000Z",
-    "lastContact": "2026-08-18T09:50:00.000Z",
-    "dealValue": 865000,
-    "dealCurrency": "INR"
-  },
-  {
-    "id": "cus_030",
-    "name": "Daniel Park",
-    "email": "daniel.park@keplerdesk.com",
-    "phone": "+1 (425) 555-0136",
-    "company": "Kepler Desk",
-    "status": "active",
-    "createdAt": "2026-01-15T15:55:00.000Z",
-    "lastContact": "2026-08-10T14:15:00.000Z",
-    "dealValue": 38700,
-    "dealCurrency": "USD"
-  },
-  {
     "id": "cus_031",
     "name": "Victoria Adams",
     "email": "victoria.adams@rivermark.dev",
@@ -405,17 +417,5 @@
     "lastContact": "2026-08-13T15:00:00.000Z",
     "dealValue": 1955000,
     "dealCurrency": "INR"
-  },
-  {
-    "id": "cus_036",
-    "name": "Aaron Scott",
-    "email": "aaron.scott@pixelbay.app",
-    "phone": "+1 (702) 555-0196",
-    "company": "PixelBay",
-    "status": "lead",
-    "createdAt": "2026-08-01T12:50:00.000Z",
-    "lastContact": "2026-08-17T08:30:00.000Z",
-    "dealValue": 4900,
-    "dealCurrency": "USD"
   }
 ]

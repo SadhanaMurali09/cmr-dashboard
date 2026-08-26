@@ -56,16 +56,18 @@ export function DraggableCustomerRow({
           {...attributes}
           {...listeners}
           type="button"
-          aria-label="Drag to reorder"
+          aria-label={`Drag to reorder ${customer.name}`}
           onClick={(e) => e.stopPropagation()}
           className={cn(
-            "flex items-center justify-center rounded p-0.5",
-            "text-muted-foreground/0 transition-all duration-150",
+            "flex h-11 w-11 items-center justify-center rounded-md border border-border/60 bg-background/90 text-muted-foreground shadow-sm",
+            "transition-all duration-150",
+            "sm:h-8 sm:w-8 sm:border-transparent sm:bg-transparent sm:shadow-none",
             "group-hover:text-muted-foreground hover:text-foreground",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            "cursor-grab active:cursor-grabbing",
-            isDragOverlay && "text-muted-foreground cursor-grabbing"
+            "cursor-grab active:cursor-grabbing touch-none select-none pointer-events-auto",
+            isDragOverlay && "cursor-grabbing"
           )}
+          style={{ touchAction: "none" }}
         >
           <GripVertical className="h-4 w-4" />
         </button>
